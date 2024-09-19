@@ -6,7 +6,7 @@ Open Trivia Night is a trivia game designed to be played in groups, heavily insp
 
 The goal of the game is to answer trivia questions correctly before the other players. Questions have a points value associated, which are awarded to the player who first buzzes in with the correct answer.
 
-One player designates themselves the Host, and creates the game. When a game is created, a 4 character Game ID is generated. Other players in the group can use this Game ID to join. 
+One player designates themselves the Host, and creates the game. When a game is created, a 4-character Game ID is generated. Other players in the group can use this Game ID to join. 
 
 Once the Host starts the game, new contestants will no longer be able to join. Players already in the game can rejoin by using the same name, in case they get disconnected.
 
@@ -14,7 +14,7 @@ Detailed instructions on how to play are available on the [homepage](https://ope
 
 ## Question Sources
 
-When the Host is creating a game, they have the choice of inputting questions themselves, or using one of the integrated question sources to generate categories of questions. These sources are [The Trivia API](https://the-trivia-api.com) and the [Open Trivia Database](https://opentdb.com). Both of these sources contain a mix of user-submitted questions and generated questions.
+When the Host is creating a game, they have the choice of inputting questions themselves, or, using one of the integrated question sources to generate categories of questions. These sources are [The Trivia API](https://the-trivia-api.com) and the [Open Trivia Database](https://opentdb.com). Both of these sources contain a mix of user-submitted questions and generated questions.
 
 When using a question source, questions are generated one category at a time, with each category containing 5 questions. The points value of the question is calculated as `<round-number> * <question-number> * 100`. For example, each group of 5 questions in round 1 will have the points values `100, 200, 300, 400, 500`. In round 2, these are all doubled.
 
@@ -22,7 +22,7 @@ When creating custom questions, there is no limit to the number of categories, o
 
 ## Contributions
 
-Contributions of any kind are more than welcome. If you find a bug or need any help, please [open a issue](https://github.com/BrownKnight/OpenTriviaNight/issues/new).
+Contributions of any kind are more than welcome. If you find a bug or need any help, please [open an issue](https://github.com/BrownKnight/OpenTriviaNight/issues/new).
 
 ## Self Hosting
 
@@ -48,7 +48,7 @@ Then run `docker compose up -d` to start the application. Navigate to `http://lo
 
 ### Running with Docker
 
-Simply pull and run the image, making sure to map to port 3000. Some optional environment variables are set to minimise logging.
+Simply pull and run the image, making sure to map to port 3000. Some optional environment variables are set to minimize logging.
 ```sh
 docker run --pull always --name opentrivianight -e RUST_LOG=info -p 3000:3000 ghcr.io/brownknight/opentrivianight:latest
 ```
@@ -95,16 +95,16 @@ To join a game, the client establishes a WebSocket connection to `/api/stream/ga
 - `<player-role>` is one of: `Host`, `Contestant`, or `Spectator`
 - `<username>` is their username which may be up to 20 characters long
 
-When the connection is successfully established, the backend adds the player to the game, and broadcasts a message to all other players to tell them about the new player.
+When the connection is successfully established, the backend adds the player to the game and broadcasts a message to all other players to tell them about the new player.
 
-Internally, the WebSocket thread on the server subscribes to a Channel. Each Game has a single Channel associated to it, and all game actions are broadcast via this Channel. This way, all players are always kept up-to-date about the state of the game, as all actions completed in the game result in a message being sent to this Channel.
+Internally, the WebSocket thread on the server subscribes to a Channel. Each Game has a single Channel associated with it, and all game actions are broadcast via this Channel. This way, all players are always kept up-to-date about the state of the game, as all actions completed in the game result in a message being sent to this Channel.
 
 When the client wants to send a request, they send a [`UpdateGameRequest`](/server-rs/src/dto.rs#L58) specifying the action they are requesting. This is sent fire-and-forget, there is no specific response generated and tracked for the request. 
 
-If the request is successful, the server will send an appropiate [`GameMessage`](/server-rs/src/dto.rs#L12) on the WebSockets for all players. 
+If the request is successful, the server will send an appropriate [`GameMessage`](/server-rs/src/dto.rs#L12) on the WebSockets for all players. 
 
 If the request errors out, a [`GameMessage::ReportError`](/server-rs/src/dto.rs#L22) will be generated, and the user who initiated the request will receive the message in their WebSocket. This usually includes a user-friendly error message that can be displayed. A common source of errors is when 2 players buzz in to answer a question at the same time, one of the players will always receive an error as their request will have been processed after the first player to buzz in.
 
-On the server, all games are stored in a `Arc<DashMap<K, V>>`, where `K` is a `String` and `V` is a `GameEntry`. Using a [`DashMap`](https://docs.rs/dashmap/latest/dashmap/) means that all operations on a `GameEntry` require a lock, which makes operations on games completely thread-safe.
+On the server, all games are stored in an `Arc<DashMap<K, V>>`, where `K` is a `String` and `V` is a `GameEntry`. Using a [`DashMap`](https://docs.rs/dashmap/latest/dashmap/) means that all operations on a `GameEntry` require a lock, which makes operations on games completely thread-safe.
 
 All requests are processed in the [`handle_game_request`](/server-rs/src/actions.rs#L113) method. This method takes a `RefMut` of the game entry, which ensures that it is only called after a lock has been obtained on the whole game.
