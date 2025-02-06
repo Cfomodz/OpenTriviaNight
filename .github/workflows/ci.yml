@@ -1,4 +1,4 @@
-name: deploy
+name: ci
 
 on:
   push:
@@ -47,7 +47,7 @@ jobs:
           build-args: 
             VERSION=${{ env.VERSION }}
           push: true
-          tags: 'ghcr.io/brownknight/opentrivianight:${{ env.VERSION }},ghcr.io/brownknight/opentrivianight:latest'
+          tags: 'ghcr.io/justaman62/opentrivianight:${{ env.VERSION }},ghcr.io/justaman62/opentrivianight:latest'
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/arm64
